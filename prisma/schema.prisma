@@ -1,0 +1,579 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Enums
+// ==========================================
+
+enum UserRole {
+  PATIENT
+  PHYSIOTHERAPIST
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REJECTED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum AppointmentType {
+  HOME_VISIT
+  CLINIC_VISIT
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum PhysioOnlineStatus {
+  OFFLINE
+  ONLINE
+  BUSY
+}
+
+enum ServiceRequestStatus {
+  SEARCHING
+  OFFERED
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum DocumentType {
+  ID_PROOF
+  DEGREE_CERTIFICATE
+  MEDICAL_REGISTRATION
+  CLINIC_PROOF
+  OTHER
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+// ==========================================
+// User & Auth Models (Better Auth Compatible)
+// ==========================================
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  phone         String?
+  role          UserRole  @default(PATIENT)
+  password      String? // Argon2 hashed password
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  patient         Patient?
+  physiotherapist Physiotherapist?
+  admin           Admin?
+  sessions        Session[]
+  accounts        Account[]
+  notifications   Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?   @db.Text
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  count       Int      @default(1)
+  lastRequest BigInt   @default(0)
+  expiresAt   DateTime
+
+  @@index([key])
+  @@index([expiresAt])
+}
+
+// ==========================================
+// Core Domain Profiles
+// ==========================================
+
+model Patient {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  fullName         String
+  phone            String
+  email            String
+  gender           String?
+  dateOfBirth      DateTime?
+  emergencyContact String?
+  medicalHistory   String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addresses       Address[]
+  bookings        Booking[]
+  reviews         Review[]
+  serviceRequests ServiceRequest[]
+
+  @@index([userId])
+  @@index([phone])
+  @@index([deletedAt])
+}
+
+model Physiotherapist {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  fullName             String
+  profilePhoto         String?
+  phone                String
+  email                String
+  experienceYears      Int                @default(0)
+  consultationFee      Float              @default(500)
+  bio                  String?            @db.Text
+  languages            String[]           @default(["Hindi", "English"])
+  city                 String             @default("Etawah")
+  state                String             @default("Uttar Pradesh")
+  clinicAddress        String?            @db.Text
+  homeVisitAvailable   Boolean            @default(true)
+  clinicVisitAvailable Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(PENDING)
+  rejectionReason      String?            @db.Text
+  averageRating        Float              @default(5.0)
+  totalReviews         Int                @default(0)
+
+  // Real-time marketplace availability
+  onlineStatus PhysioOnlineStatus @default(OFFLINE)
+  lastOnlineAt DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user            User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specializations PhysiotherapistSpecialization[]
+  documents       UploadedDocument[]
+  availability    Availability[]
+  bookings        Booking[]
+  reviews         Review[]
+  location        PhysiotherapistLocation?
+  offers          ServiceRequestOffer[]
+
+  @@index([userId])
+  @@index([city, verificationStatus])
+  @@index([verificationStatus])
+  @@index([onlineStatus])
+  @@index([homeVisitAvailable])
+  @@index([clinicVisitAvailable])
+  @@index([averageRating])
+  @@index([deletedAt])
+}
+
+model PhysiotherapistLocation {
+  id                String @id @default(uuid())
+  physiotherapistId String @unique
+
+  latitude  Decimal @db.Decimal(10, 7)
+  longitude Decimal @db.Decimal(10, 7)
+
+  locationUpdatedAt DateTime @default(now())
+
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+
+  @@index([latitude, longitude])
+  @@index([locationUpdatedAt])
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  fullName     String
+  phone        String?
+  department   String   @default("Operations - Etawah")
+  isSuperAdmin Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ==========================================
+// Address Management (Patient Home Visits)
+// ==========================================
+
+model Address {
+  id        String   @id @default(uuid())
+  patientId String
+  label     String   @default("Home") // Home, Clinic, Work, Parents
+  street    String
+  landmark  String?
+  area      String // Friends Colony, Civil Lines, Ashok Nagar, etc.
+  city      String   @default("Etawah")
+  state     String   @default("Uttar Pradesh")
+  pincode   String   @default("206001")
+  isDefault Boolean  @default(false)
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  patient         Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+  serviceRequests ServiceRequest[]
+
+  @@index([patientId])
+  @@index([patientId, isDefault])
+  @@index([area])
+  @@index([deletedAt])
+}
+
+// ==========================================
+// Specializations & Documents
+// ==========================================
+
+model Specialization {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  physiotherapists PhysiotherapistSpecialization[]
+
+  @@index([slug])
+}
+
+model PhysiotherapistSpecialization {
+  physiotherapistId String
+  specializationId  String
+  createdAt         DateTime @default(now())
+
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+  specialization  Specialization  @relation(fields: [specializationId], references: [id], onDelete: Cascade)
+
+  @@id([physiotherapistId, specializationId])
+  @@index([physiotherapistId])
+  @@index([specializationId])
+}
+
+model UploadedDocument {
+  id                 String             @id @default(uuid())
+  physiotherapistId  String
+  documentType       DocumentType
+  title              String
+  fileUrl            String
+  fileSize           Int?
+  mimeType           String?
+  verificationStatus VerificationStatus @default(PENDING)
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  rejectionReason    String?            @db.Text
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+
+  @@index([physiotherapistId])
+  @@index([verificationStatus])
+}
+
+// ==========================================
+// Availability Scheduling (Multi-interval per day)
+// ==========================================
+
+model Availability {
+  id                  String    @id @default(uuid())
+  physiotherapistId   String
+  dayOfWeek           DayOfWeek
+  startTime           String // "09:00"
+  endTime             String // "18:00"
+  slotDurationMinutes Int       @default(60)
+  isActive            Boolean   @default(true)
+  isHomeVisit         Boolean   @default(true)
+  isClinicVisit       Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+
+  @@index([physiotherapistId])
+  @@index([dayOfWeek, isActive])
+}
+
+// ==========================================
+// On-Demand Service Requests & Matching
+// ==========================================
+
+model ServiceRequest {
+  id            String @id @default(uuid())
+  requestNumber String @unique // e.g. PC-REQ-2026-XXXX
+
+  patientId       String
+  appointmentType AppointmentType
+
+  addressId String?
+
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+
+  chiefComplaint String? @db.Text
+  notes          String? @db.Text
+
+  requestedDate DateTime? @db.Date
+  requestedTime String?
+
+  status ServiceRequestStatus @default(SEARCHING)
+
+  expiresAt   DateTime?
+  acceptedAt  DateTime?
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient Patient  @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  address Address? @relation(fields: [addressId], references: [id], onDelete: SetNull)
+
+  offers  ServiceRequestOffer[]
+  booking Booking?
+
+  @@index([patientId])
+  @@index([status])
+  @@index([appointmentType])
+  @@index([createdAt])
+}
+
+model ServiceRequestOffer {
+  id String @id @default(uuid())
+
+  serviceRequestId  String
+  physiotherapistId String
+
+  distanceKm       Decimal? @db.Decimal(8, 2)
+  estimatedMinutes Int?
+
+  status OfferStatus @default(PENDING)
+
+  offeredAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  respondedAt DateTime?
+
+  serviceRequest  ServiceRequest  @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceRequestId, physiotherapistId])
+  @@index([serviceRequestId, status])
+  @@index([physiotherapistId, status])
+}
+
+// ==========================================
+// Booking & Appointments (Scheduled & On-Demand Converged)
+// ==========================================
+
+model Booking {
+  id                 String          @id @default(uuid())
+  bookingNumber      String          @unique // e.g. PC-ETA-2026-XXXX
+  patientId          String
+  physiotherapistId  String
+  appointmentType    AppointmentType
+  addressId          String? // Mandatory for HOME_VISIT
+  appointmentDate    DateTime        @db.Date
+  timeSlot           String // e.g. "10:00 AM" or "10:00"
+  status             BookingStatus   @default(PENDING)
+  chiefComplaint     String?         @db.Text
+  notes              String?         @db.Text
+  amount             Float
+  cancellationReason String?         @db.Text
+  cancelledBy        String?
+  completedAt        DateTime?
+
+  // On-demand marketplace linkage (null for purely scheduled bookings)
+  serviceRequestId String?         @unique
+  serviceRequest   ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  patient         Patient         @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Restrict)
+  address         Address?        @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  payment         Payment?
+  review          Review?
+
+  // Prevents overlapping double-bookings for the exact same physio, date and slot
+  @@unique([physiotherapistId, appointmentDate, timeSlot])
+  @@index([patientId])
+  @@index([physiotherapistId])
+  @@index([status])
+  @@index([appointmentDate])
+  @@index([appointmentType])
+  @@index([deletedAt])
+}
+
+// ==========================================
+// Razorpay Payment Management
+// ==========================================
+
+model Payment {
+  id                String        @id @default(uuid())
+  bookingId         String        @unique
+  amount            Float
+  currency          String        @default("INR")
+  status            PaymentStatus @default(PENDING)
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  razorpaySignature String?
+  receipt           String?
+  refundId          String?
+  refundAmount      Float?
+  refundStatus      String?
+  errorMessage      String?       @db.Text
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([razorpayOrderId])
+  @@index([razorpayPaymentId])
+}
+
+// ==========================================
+// Verified Reviews (Completed Appointments)
+// ==========================================
+
+model Review {
+  id                String   @id @default(uuid())
+  bookingId         String   @unique
+  physiotherapistId String
+  patientId         String
+  rating            Int // 1 to 5 stars
+  comment           String?  @db.Text
+  isPublished       Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  booking         Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  physiotherapist Physiotherapist @relation(fields: [physiotherapistId], references: [id], onDelete: Cascade)
+  patient         Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([physiotherapistId])
+  @@index([patientId])
+  @@index([rating])
+}
+
+// ==========================================
+// In-App Notifications
+// ==========================================
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  title     String
+  message   String    @db.Text
+  type      String
+  link      String?
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
