@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: "PhysioConnect | Book Verified Physiotherapists in Etawah, UP",
   description:
     "Etawah's first on-demand physiotherapy booking platform. Book certified home visits and clinic appointments with licensed physiotherapists.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
