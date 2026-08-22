@@ -127,12 +127,12 @@ export function BookingSlotPicker({
         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Step 1: Choose Visit Mode
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {homeVisitAvailable && (
             <button
               type="button"
               onClick={() => setAppointmentType("HOME_VISIT")}
-              className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all ${
+              className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all min-w-0 ${
                 appointmentType === "HOME_VISIT"
                   ? "border-primary bg-primary/10 shadow-xs"
                   : "border-input bg-background hover:bg-muted/40"
@@ -147,9 +147,11 @@ export function BookingSlotPicker({
               >
                 <Home className="h-4 w-4" />
               </div>
-              <div className="text-xs space-y-0.5">
+              <div className="text-xs space-y-0.5 flex-1 min-w-0">
                 <p className="font-semibold text-foreground">Home Visit</p>
-                <p className="text-[11px] text-muted-foreground">Doctor visits your Etawah address</p>
+                <p className="text-[11px] text-muted-foreground break-words">
+                  Doctor visits your Etawah address
+                </p>
               </div>
             </button>
           )}
@@ -158,7 +160,7 @@ export function BookingSlotPicker({
             <button
               type="button"
               onClick={() => setAppointmentType("CLINIC_VISIT")}
-              className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all ${
+              className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all min-w-0 ${
                 appointmentType === "CLINIC_VISIT"
                   ? "border-primary bg-primary/10 shadow-xs"
                   : "border-input bg-background hover:bg-muted/40"
@@ -173,9 +175,9 @@ export function BookingSlotPicker({
               >
                 <Hospital className="h-4 w-4" />
               </div>
-              <div className="text-xs space-y-0.5">
+              <div className="text-xs space-y-0.5 flex-1 min-w-0">
                 <p className="font-semibold text-foreground">Clinic Visit</p>
-                <p className="text-[11px] text-muted-foreground truncate">
+                <p className="text-[11px] text-muted-foreground break-words leading-relaxed">
                   {clinicAddress || "Etawah Clinic"}
                 </p>
               </div>

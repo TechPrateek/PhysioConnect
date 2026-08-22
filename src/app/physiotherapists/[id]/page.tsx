@@ -148,7 +148,7 @@ export default async function PhysiotherapistDetailPage(props: PhysioDetailPageP
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <Hospital className="h-3.5 w-3.5 text-primary" /> Clinic Visit
                     </span>
-                    <p className="font-semibold text-foreground truncate">
+                    <p className="font-semibold text-foreground break-words leading-snug">
                       {physio.clinicVisitAvailable
                         ? physio.clinicAddress || "Available at Clinic"
                         : "Home visits only"}
