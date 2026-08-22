@@ -36,9 +36,9 @@ export function PhysioCard({ physio }: PhysioCardProps) {
       interactive
       className="flex flex-col justify-between overflow-hidden group border border-white/60 dark:border-cyan-500/20"
     >
-      <div className="p-6 space-y-4">
+      <div className="p-4 sm:p-6 space-y-3.5 sm:space-y-4">
         {/* Top Doctor Profile Bar */}
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-start gap-3 sm:gap-3.5">
           <div className="relative">
             <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 via-teal-500/10 to-primary/5 border border-primary/25 text-primary font-black text-base shadow-soft transition-transform group-hover:scale-105">
               {initials}
@@ -132,11 +132,11 @@ export function PhysioCard({ physio }: PhysioCardProps) {
         </div>
       </div>
 
-      <div className="border-t border-border/60 bg-white/40 dark:bg-white/[0.02] p-4 backdrop-blur-sm">
+      <div className="border-t border-border/60 bg-white/40 dark:bg-white/[0.02] p-3.5 sm:p-4 backdrop-blur-sm">
         <Link href={`/physiotherapists/${physio.id}`} className="w-full block">
           <Button
             size="sm"
-            className="w-full rounded-xl text-xs font-bold gap-1.5 shadow-soft bg-primary text-primary-foreground hover:bg-primary/90 transition-all group-hover:scale-[1.01]"
+            className="w-full rounded-xl text-xs font-bold gap-1.5 shadow-soft bg-primary text-primary-foreground hover:bg-primary/90 transition-all group-hover:scale-[1.01] h-10 sm:h-9"
           >
             <span>View Profile & Book</span>
             <ChevronRight className="h-3.5 w-3.5" />

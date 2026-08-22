@@ -111,13 +111,13 @@ export function SearchFilters({
       </form>
 
       {/* Filter Row: Visit Type & Sort */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-        {/* Visit Type Buttons */}
-        <div className="flex items-center rounded-2xl glass-subtle p-1 text-xs font-semibold gap-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+        {/* Visit Type Buttons (Equal 3-column grid on mobile, inline on desktop) */}
+        <div className="grid grid-cols-3 sm:flex items-center rounded-2xl glass-subtle p-1 text-xs font-semibold gap-1 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => handleVisitTypeChange("ALL")}
-            className={`rounded-xl px-3.5 py-1.5 transition-all ${
+            className={`rounded-xl px-2.5 sm:px-3.5 py-2 sm:py-1.5 text-center transition-all ${
               visitType === "ALL"
                 ? "bg-primary text-primary-foreground shadow-soft font-bold"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/40 dark:hover:bg-white/5"
@@ -128,49 +128,51 @@ export function SearchFilters({
           <button
             type="button"
             onClick={() => handleVisitTypeChange("HOME_VISIT")}
-            className={`rounded-xl px-3.5 py-1.5 transition-all ${
+            className={`rounded-xl px-2.5 sm:px-3.5 py-2 sm:py-1.5 text-center transition-all ${
               visitType === "HOME_VISIT"
                 ? "bg-primary text-primary-foreground shadow-soft font-bold"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/40 dark:hover:bg-white/5"
             }`}
           >
-            Home Visits Only
+            Home Visit
           </button>
           <button
             type="button"
             onClick={() => handleVisitTypeChange("CLINIC_VISIT")}
-            className={`rounded-xl px-3.5 py-1.5 transition-all ${
+            className={`rounded-xl px-2.5 sm:px-3.5 py-2 sm:py-1.5 text-center transition-all ${
               visitType === "CLINIC_VISIT"
                 ? "bg-primary text-primary-foreground shadow-soft font-bold"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/40 dark:hover:bg-white/5"
             }`}
           >
-            Clinic Consultations
+            Clinic Visit
           </button>
         </div>
 
-        {/* Sort Dropdown */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground flex items-center gap-1 font-semibold">
-            <SlidersHorizontal className="h-3.5 w-3.5" /> Sort:
-          </span>
-          <select
-            value={sortBy}
-            onChange={(e) => handleSortChange(e.target.value as any)}
-            className="h-9 rounded-xl border border-input glass-subtle px-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="rating">Top Rated (★)</option>
-            <option value="experience">Most Experienced</option>
-            <option value="fee_asc">Fee: Low to High</option>
-            <option value="fee_desc">Fee: High to Low</option>
-          </select>
+        {/* Sort Dropdown & Reset */}
+        <div className="flex items-center justify-between sm:justify-end gap-2 text-xs w-full sm:w-auto">
+          <div className="flex items-center gap-1.5 flex-1 sm:flex-none">
+            <span className="text-muted-foreground flex items-center gap-1 font-semibold text-[11px] sm:text-xs">
+              <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" /> Sort:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as any)}
+              className="h-9 rounded-xl border border-input glass-subtle px-2.5 sm:px-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary flex-1 sm:flex-none"
+            >
+              <option value="rating">Top Rated (★)</option>
+              <option value="experience">Most Experienced</option>
+              <option value="fee_asc">Fee: Low to High</option>
+              <option value="fee_desc">Fee: High to Low</option>
+            </select>
+          </div>
 
           {hasActiveFilters && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="h-9 px-3 text-xs font-bold text-muted-foreground hover:text-foreground gap-1 rounded-xl"
+              className="h-9 px-2.5 sm:px-3 text-xs font-bold text-muted-foreground hover:text-foreground gap-1 rounded-xl"
             >
               <X className="h-3.5 w-3.5" />
               Reset

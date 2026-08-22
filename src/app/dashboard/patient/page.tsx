@@ -85,9 +85,11 @@ export default async function PatientDashboardPage() {
                 </div>
               </Link>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               <ThemeToggle />
-              <OnDemandBookingModal addresses={addresses} />
+              <div className="hidden sm:block">
+                <OnDemandBookingModal addresses={addresses} />
+              </div>
               <NotificationsDropdown />
               <UserMenu user={user} />
             </div>

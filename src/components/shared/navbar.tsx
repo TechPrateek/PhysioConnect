@@ -70,6 +70,7 @@ export async function Navbar() {
                       ? "/dashboard/physiotherapist"
                       : "/dashboard/patient"
                   }
+                  className="hidden md:inline-flex"
                 >
                   <Button
                     variant="ghost"

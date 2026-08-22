@@ -39,16 +39,16 @@ export default async function BrowsePage(props: BrowsePageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-muted/20 py-8 sm:py-12">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-muted/20 py-4 sm:py-10">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary mb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-0.5 text-[11px] sm:text-xs font-semibold text-primary mb-1.5">
             <span>Etawah Territory Directory</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
             Book Verified Physiotherapists in Etawah
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
             Choose certified practitioners for home visits or nearby clinic consultations in Friends Colony, Civil Lines, Ashok Nagar, and surrounding areas.
           </p>
         </div>

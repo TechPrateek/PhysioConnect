@@ -69,19 +69,21 @@ export default async function PhysiotherapistDashboardPage() {
                 </div>
               </Link>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               <ThemeToggle />
-              <GlassBadge
-                variant={
-                  isApproved ? "success" : isRejected ? "destructive" : "warning"
-                }
-              >
-                {isApproved
-                  ? "✓ Verified Doctor"
-                  : isRejected
-                  ? "Verification Rejected"
-                  : "Verification Pending"}
-              </GlassBadge>
+              <div className="hidden sm:block">
+                <GlassBadge
+                  variant={
+                    isApproved ? "success" : isRejected ? "destructive" : "warning"
+                  }
+                >
+                  {isApproved
+                    ? "✓ Verified Doctor"
+                    : isRejected
+                    ? "Verification Rejected"
+                    : "Verification Pending"}
+                </GlassBadge>
+              </div>
               <NotificationsDropdown />
               <UserMenu user={user} />
             </div>
