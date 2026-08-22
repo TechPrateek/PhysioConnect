@@ -92,12 +92,21 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
         </button>
       </div>
 
-      {/* Mobile Interactive Dropdown Menu upon clicking Profile Icon */}
+      {/* Mobile Interactive Dropdown — with full-screen backdrop to block background bleed-through */}
       {isOpen && (
-        <div className="md:hidden absolute right-0 mt-2 w-56 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-          <GlassIsland level={4} glow="teal" className="p-3 shadow-soft-lg border border-border/80 space-y-2">
-            {/* User Info Header */}
-            <div className="border-b border-border/60 pb-2.5 px-1 space-y-0.5">
+        <>
+          {/* Dim overlay: covers whole screen, closes menu on tap */}
+          <div
+            className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Dropdown panel — solid background, no glass bleed */}
+          <div className="md:hidden absolute right-0 mt-2 w-60 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="rounded-2xl border border-border shadow-2xl overflow-hidden bg-card text-card-foreground">
+              {/* User Info Header */}
+              <div className="border-b border-border px-4 py-3 space-y-0.5 bg-primary/5">
               <div className="flex items-center justify-between gap-1">
                 <p className="text-xs font-black text-foreground truncate">{user.name}</p>
                 <Badge
@@ -108,7 +117,7 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
                       ? "info"
                       : "default"
                   }
-                  className="text-[9px] px-1.5 py-0 font-bold"
+                  className="text-[9px] px-1.5 py-0 font-bold shrink-0"
                 >
                   {user.role}
                 </Badge>
@@ -117,13 +126,13 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
             </div>
 
             {/* Menu Navigation Links */}
-            <div className="space-y-1 text-xs font-semibold">
+            <div className="px-2 py-2 space-y-0.5 text-xs font-semibold">
               <Link
                 href={dashboardUrl}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
-                <LayoutDashboard className="h-4 w-4 text-primary" />
+                <LayoutDashboard className="h-4 w-4 text-primary shrink-0" />
                 <span>Dashboard</span>
               </Link>
 
@@ -132,17 +141,17 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
                   <Link
                     href="/dashboard/patient/bookings"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <Calendar className="h-4 w-4 text-primary" />
+                    <Calendar className="h-4 w-4 text-primary shrink-0" />
                     <span>My Bookings</span>
                   </Link>
                   <Link
                     href="/dashboard/patient/addresses"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <MapPin className="h-4 w-4 text-primary" />
+                    <MapPin className="h-4 w-4 text-primary shrink-0" />
                     <span>My Addresses</span>
                   </Link>
                 </>
@@ -152,16 +161,16 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
                 <Link
                   href="/dashboard/physiotherapist/bookings"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                 >
-                  <Calendar className="h-4 w-4 text-primary" />
+                  <Calendar className="h-4 w-4 text-primary shrink-0" />
                   <span>Appointments</span>
                 </Link>
               )}
             </div>
 
-            {/* Logout Action */}
-            <div className="border-t border-border/60 pt-1.5">
+            {/* Logout */}
+            <div className="border-t border-border px-2 py-2">
               <button
                 type="button"
                 onClick={() => {
@@ -169,14 +178,15 @@ export function UserMenu({ user }: { user: AuthenticatedUser }) {
                   handleLogout();
                 }}
                 disabled={isLoggingOut}
-                className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-xl text-destructive hover:bg-destructive/10 text-xs font-bold transition-colors"
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-destructive hover:bg-destructive/10 text-xs font-bold transition-colors"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4 shrink-0" />
                 <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
               </button>
             </div>
-          </GlassIsland>
+          </div>
         </div>
+        </>
       )}
     </div>
   );
