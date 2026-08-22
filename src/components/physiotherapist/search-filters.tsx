@@ -88,7 +88,7 @@ export function SearchFilters({
     sortBy !== "rating";
 
   return (
-    <GlassIsland level={2} className="p-5 sm:p-7 space-y-4 shadow-soft-md">
+    <GlassIsland level={2} className="p-3.5 sm:p-7 space-y-3 sm:space-y-4 shadow-soft-md overflow-hidden">
       {/* Search Input Bar */}
       <form onSubmit={handleSearchSubmit} className="flex gap-2">
         <div className="relative flex-1">
