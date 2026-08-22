@@ -73,8 +73,14 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply scroll-smooth overflow-x-hidden;
+    max-width: 100vw;
+  }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-200;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-200 overflow-x-hidden;
+    max-width: 100vw;
+    width: 100%;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

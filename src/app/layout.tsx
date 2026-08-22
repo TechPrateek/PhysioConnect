@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AmbientBackground } from "@/components/shared/ambient-background";
@@ -8,6 +8,16 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b132b" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "PhysioConnect | Book Verified Physiotherapists in Etawah, UP",
@@ -30,8 +40,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans min-h-screen bg-background text-foreground antialiased flex flex-col relative`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={`${inter.variable} font-sans min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-background text-foreground antialiased flex flex-col relative`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
           <AmbientBackground />
           {children}
         </ThemeProvider>

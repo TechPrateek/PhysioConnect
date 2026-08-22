@@ -29,9 +29,9 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-7">
-              <div className="inline-flex items-center gap-2 rounded-full glass-subtle px-4 py-1 text-xs font-bold text-primary shadow-xs">
-                <MapPin className="h-3.5 w-3.5" />
-                <span>Pan-India Healthcare • Pilot Live in Etawah, UP</span>
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full glass-subtle px-3.5 sm:px-4 py-1 text-[11px] sm:text-xs font-bold text-primary shadow-xs max-w-full">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">Pan-India Healthcare • Pilot Live in Etawah, UP</span>
               </div>
 
               <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
